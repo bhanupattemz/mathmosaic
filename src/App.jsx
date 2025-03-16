@@ -1,27 +1,21 @@
-import { useState } from 'react'
-import GenpuzzleImages from "./GenpuzzleImages"
-import Genpuzzle from './GenPuzzle'
+import { Fragment, useEffect, useState } from 'react'
+import Genpuzzle from "./Genpuzzle.jsx"
 import './App.css'
-
+import Header from "./Header"
+import Footer from "./Footer"
 function App() {
-  const findShiftNum = (arr) => {
-    if(!arr) return 0
-    const original = [0, 1, 2, 3];
-    return (original.indexOf(arr[0]) + original.length) % original.length;
-  };
-  const [gridSize, setGridSize] = useState(4)
-  const [sol, setSol] = useState(Genpuzzle(gridSize))
-  const puzzleImages = GenpuzzleImages(gridSize)
-  if(!sol){
-    return <div>Loading...</div>
-  }
+  const [gridSize, setGridSize] = useState(2);
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${gridSize}, 1fr)`, gap: "10px" }}>
-      {puzzleImages.map((img, index) => (
-        <img key={index} src={img} alt={`Grid ${index}`} width={50} height={50} style={{ transform: `rotate(${findShiftNum(sol[index]) * 90}deg)` }} />
-      ))}
-    </div>
-  )
+    <Fragment>
+      <Header setGridSize={setGridSize} />
+      <main>
+        <Genpuzzle key={gridSize} gridSize={gridSize} />
+      </main>
+      <Footer />
+    </Fragment>
+  );
 }
+
 
 export default App

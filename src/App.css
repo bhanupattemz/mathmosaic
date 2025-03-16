@@ -1,0 +1,233 @@
+body {
+  margin: 0px;
+}
+
+/* Genpuzzle*/
+.genpuzzle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 85vh;
+  background-color: #f0f4f8;
+  font-family: 'Arial', sans-serif;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.grid-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.grid-container img:hover {
+  transform: scale(1.05);
+}
+
+.loading {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* DragDrop */
+/* Add this CSS to your stylesheet or a separate CSS file */
+.drag-drop-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.drag-source {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px;
+  flex-wrap: wrap;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  justify-content: center;
+}
+
+.drag-item {
+  width: 50px;
+  height: 50px;
+  background-color: #bbdefb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  border: 2px solid #64b5f6;
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.drag-item:hover {
+  transform: scale(1.05);
+}
+
+.drag-item img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.drop-grid {
+  display: grid;
+  gap: 1px;
+  margin-bottom: 20px;
+}
+
+.drop-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.drop-cell {
+  width: 50px;
+  height: 50px;
+  background-color: #f5f5f5;
+  border: 2px solid #bdbdbd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.drop-cell.active {
+  border: 3px solid #000;
+}
+
+.drop-cell img {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
+.rotate-buttons {
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.rotate-buttons button {
+  margin-right: 10px;
+  padding: 8px 16px;
+  background-color: #64b5f6;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.rotate-buttons button:hover {
+  background-color: #42a5f5;
+}
+
+.solved-message {
+  margin-top: 15px;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.solve-button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.solve-button:hover {
+  background-color: #388e3c;
+}
+
+.count-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  font-size: 1.3rem;
+}
+
+.count-container>p {
+  margin: 0px 0px 5px 0px;
+}
+
+.drag-drop-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.drag-drop-div>div {
+  width: 98%;
+  padding: 10px;
+  flex-wrap: wrap;
+  background-color: #e3f2fd;
+  border-radius: 8px;
+  justify-content: center;
+  height: 100%;
+}
+
+.rotate-buttons svg {
+  transform: translateY(2px);
+}
+
+.solution-images {
+  display: flex;
+  justify-content: center;
+}
+
+.solution-images img {
+  width: 80px;
+  height: 80px;
+  margin: 1px;
+}
+
+@media only screen and (max-width: 600px),
+(max-device-width: 600px) {
+  .count-container {
+    font-size: 1rem;
+  }
+
+  .drag-item {
+    width: 30px;
+    height: 30px;
+  }
+
+  .drop-cell {
+    width: 30px;
+    height: 30px;
+  }
+
+  .drag-drop-container {
+    margin-bottom: 30px;
+  }
+  .solution-images img {
+    width: 50px;
+    height: 50px;
+  }
+}
