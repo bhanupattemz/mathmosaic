@@ -2,7 +2,6 @@
 
 const leftRotate = (arr, n) => {
     if (!Array.isArray(arr) || arr.length === 0) return [];
-
     const len = arr.length;
     n = n % len; 
 
@@ -80,7 +79,6 @@ const CheckSolution = (grid) => {
     if (!Array.isArray(grid) || grid.length === 0) {
         return false;
     }
-    console.log(grid,"Check")
     const size = Math.sqrt(grid.length);
     if (!Number.isInteger(size)) {
         return false;
@@ -90,7 +88,6 @@ const CheckSolution = (grid) => {
     for (let i = 0; i < size; i++) {
         solution.push(grid.slice(i * size, (i + 1) * size).map(item => item.data));
     }
-
     for (let row = 0; row < size; row++) {
         for (let col = 0; col < size; col++) {
             let piece = solution[row][col];

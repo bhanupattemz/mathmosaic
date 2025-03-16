@@ -25,8 +25,7 @@ export default function Genpuzzle({ gridSize = 3 }) {
   };
 
   const randomRotate = () => {
-    setSolution([...gridImages]);
-    setLoading(true);
+    setSolution([...gridImages]); 
     let indices = Array.from({ length: gridSize * gridSize }, (_, i) => i);
     const shuffledGrid = [];
     const shuffledImages = [];
@@ -45,16 +44,17 @@ export default function Genpuzzle({ gridSize = 3 }) {
     setGridImages(shuffledImages);
     setGridData(shuffledGrid);
     setRotations(newRotations);
-    setLoading(false);
+    setRandomized(true); // ✅ Ensures shuffling happens only once
   };
 
   const transformToGridCells = (grid) => {
     const result = [];
-    console.log(grid)
     for (let i = 0; i < grid.length - 2; i += 2) {
       for (let j = 0; j < grid[i].length; j++) {
         if (j < grid[i + 1].length - 1 && j < grid[i + 2].length) {
-          result.push([grid[i][j], grid[i + 1][j + 1], grid[i + 2][j], grid[i + 1][j]]);
+          result.push([
+            grid[i][j], grid[i + 1][j + 1], grid[i + 2][j], grid[i + 1][j],
+          ]);
         }
       }
     }
@@ -72,7 +72,9 @@ export default function Genpuzzle({ gridSize = 3 }) {
         tempCanvas.height = cellSize;
         const tempCtx = tempCanvas.getContext("2d");
 
-        tempCtx.drawImage(canvas, col * cellSize, row * cellSize, cellSize, cellSize, 0, 0, cellSize, cellSize);
+        tempCtx.drawImage(
+          canvas, col * cellSize, row * cellSize, cellSize, cellSize, 0, 0, cellSize, cellSize
+        );
         images.push(tempCanvas.toDataURL());
       }
     }
@@ -83,7 +85,7 @@ export default function Genpuzzle({ gridSize = 3 }) {
   const drawOrientedSymbol = (ctx, symbolIndex, x, y) => {
     const img = new Image();
     img.src = symbols[symbolIndex];
-    
+
     return new Promise((resolve) => {
       img.onload = () => {
         ctx.drawImage(img, x, y, 32, 32);
@@ -133,18 +135,26 @@ export default function Genpuzzle({ gridSize = 3 }) {
         }
         extractGridImages(canvas);
       };
-      
       drawAllSymbols();
     }
   }, [gridSize, filled]);
 
   useEffect(() => {
-    if (gridImages.length === gridSize * gridSize && gridData.length === gridSize * gridSize && !randomized) {
-      setRandomized(true);
+    if (
+      !randomized && 
+      gridImages.length === gridSize * gridSize && 
+      gridData.length === gridSize * gridSize
+    ) {
       randomRotate();
     }
-  }, [gridData, gridImages]);
-  
+  }, [gridData, gridImages, randomized]);
+
+  useEffect(() => {
+    if (randomized) {
+      setLoading(false);
+    }
+  }, [randomized]);
+
   if (loading) {
     return <Loader />;
   }
@@ -152,7 +162,13 @@ export default function Genpuzzle({ gridSize = 3 }) {
   return (
     <div className="genpuzzle">
       <div className="grid-container">
-        <DragDrop urls={gridImages} rotations={rotations} gridData={gridData} setRotations={setRotations} solution={solution} />
+        <DragDrop 
+          urls={gridImages} 
+          rotations={rotations} 
+          gridData={gridData} 
+          setRotations={setRotations} 
+          solution={solution} 
+        />
       </div>
     </div>
   );

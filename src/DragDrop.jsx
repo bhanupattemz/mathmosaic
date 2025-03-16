@@ -21,7 +21,6 @@ export default function DragDrop({ urls, rotations, gridData, setRotation, solut
   const [open, setOpen] = useState(false)
 
   const { dragItems, droppedItems, griddata, solved, curr, count } = state;
-  console.log(gridData)
 
   const handleDragStart = useCallback((e, index, isFromDropZone = false) => {
     e.dataTransfer.setData("index", index);
