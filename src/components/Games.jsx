@@ -41,7 +41,6 @@ export default function DataGridDemo({ setGamesOpen, gamesOpen }) {
                             date: item.date,
                             level: `${item.level}*${item.level}`,
                             count: item.count
-
                         }
                     })}
                     columns={columns}

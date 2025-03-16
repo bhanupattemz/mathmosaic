@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, Fragment } from "react";
-import { CheckSolution } from "./SolvePuzzle";
-import "./App.css"
+import { CheckSolution } from "../SolvePuzzle";
+import "../App.css"
 import { FaArrowRotateLeft, FaArrowRotateRight } from "react-icons/fa6";
 import { FaCheckCircle } from "react-icons/fa";
 import Dialog from "@mui/material/Dialog";

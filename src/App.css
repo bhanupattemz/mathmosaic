@@ -199,6 +199,7 @@ body {
 .solution-images {
   display: flex;
   justify-content: center;
+  /* color: #2054ff; */
 }
 
 .solution-images img {

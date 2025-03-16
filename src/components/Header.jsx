@@ -13,20 +13,18 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import logo from "./assets/logo.png";
-import Games from "./Games"
+import logo from "../assets/logo.png";
+import Games from "./Games";
 
 function ResponsiveAppBar({ setGridSize }) {
-    const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [open, setOpen] = React.useState(false);
-    const [gamesOpen, setGamesOpen] = React.useState(false)
+    const [gamesOpen, setGamesOpen] = React.useState(false);
     const [level, setLevel] = React.useState(3);
-    const handleClose = () => {
-        setOpen(false);
-    };
+
+    const handleClose = () => setOpen(false);
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: '#1A1A1A', boxShadow: 'none' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#2054ff', boxShadow: 'none' }}>
             <Games setGamesOpen={setGamesOpen} gamesOpen={gamesOpen} />
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Set Level</DialogTitle>
@@ -47,21 +45,53 @@ function ResponsiveAppBar({ setGridSize }) {
                     <Button onClick={() => { setGridSize(level); handleClose(); }}>Confirm</Button>
                 </DialogActions>
             </Dialog>
+
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, flexGrow: 1 }}>
-                        <img src={logo} alt="logo" style={{ height: '40px', width: 'auto' }} />
-                        <Typography variant="h6" noWrap component="a" href="/" sx={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.2rem', color: '#FFFFFF', textDecoration: 'none' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+                        <Box
+                            component="img"
+                            src={logo}
+                            alt="logo"
+                            sx={{
+                                height: { xs: 30, md: 40 },
+                                width: 'auto',
+                                maxWidth: '100%',
+                                objectFit: 'contain'
+                            }}
+                        />
+                        <Typography 
+                            variant="h6" 
+                            noWrap 
+                            component="a" 
+                            href="/" 
+                            sx={{
+                                fontFamily: 'monospace',
+                                fontWeight: 700,
+                                letterSpacing: { xs: '.1rem', md: '.2rem' },
+                                color: '#FFFFFF',
+                                textDecoration: 'none',
+                                fontSize: { xs: '0.75rem', md: '1.25rem' } 
+                            }}
+                        >
                             MATHMOSAIC
                         </Typography>
                     </Box>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Button onClick={() => setOpen(true)} sx={{ color: '#FFFFFF', fontWeight: 600, textTransform: 'none', fontSize: '1rem' }}>
-                        Set Level
-                    </Button>
-                    <Button onClick={() => setGamesOpen(true)} sx={{ color: '#FFFFFF', fontWeight: 600, textTransform: 'none', fontSize: '1rem' }}>
-                        Histroy
-                    </Button>
+
+                    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button 
+                            onClick={() => setOpen(true)} 
+                            sx={{ color: '#FFFFFF', fontWeight: 600, textTransform: 'none', fontSize: { xs: '0.6rem', md: '1rem' } }}
+                        >
+                            Set Level
+                        </Button>
+                        <Button 
+                            onClick={() => setGamesOpen(true)} 
+                            sx={{ color: '#FFFFFF', fontWeight: 600, textTransform: 'none', fontSize: { xs: '0.6rem', md: '1rem' } }}
+                        >
+                            History
+                        </Button>
+                    </Box>
                 </Toolbar>
             </Container>
         </AppBar>
