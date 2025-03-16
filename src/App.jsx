@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react'
-import Genpuzzle from "./Genpuzzle.jsx"
+import Genpuzzle from "./GenPuzzle"
 import './App.css'
 import Header from "./Header"
 import Footer from "./Footer"
