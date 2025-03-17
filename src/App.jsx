@@ -9,7 +9,7 @@ import Loader from "./components/Loading";
 import "./App.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-
+import backgroundImg from "./assets/background.png"
 function App() {
   const [gridSize, setGridSize] = useState(3);
   const [gridImages, setGridImages] = useState([]);

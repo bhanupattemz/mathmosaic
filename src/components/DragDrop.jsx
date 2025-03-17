@@ -8,6 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import { MdTipsAndUpdates } from "react-icons/md";
 
 export default function DragDrop({ urls, rotations, gridData, solution, setKey }) {
   const [dragItems, setDragItems] = useState([]);
@@ -19,32 +20,75 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
   const [touchItem, setTouchItem] = useState(null);
   const [touchSource, setTouchSource] = useState(false);
   const [touchStartPos, setTouchStartPos] = useState(null);
-  
-  console.log(dragItems)
+  const [touchCurrentPos, setTouchCurrentPos] = useState(null);
+  const [touchOverElement, setTouchOverElement] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   const handleDragStart = useCallback((e, index, isFromDropZone = false) => {
     e.dataTransfer.setData("index", index);
     e.dataTransfer.setData("isFromDropZone", isFromDropZone);
+    setIsDragging(true);
   }, []);
 
   const handleTouchStart = useCallback((e, index, isFromDropZone = false) => {
-    e.preventDefault();
-   
+    // Prevent default to avoid scrolling
+    e.stopPropagation();
+    if (gridItems[index]) {
+      setCurr(index)
+    }
     const touch = e.touches[0];
     setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setTouchCurrentPos({ x: touch.clientX, y: touch.clientY });
     setTouchItem({ index, isFromDropZone });
     setTouchSource(isFromDropZone ? false : true);
+    setIsDragging(true);
   }, []);
 
   const handleTouchMove = useCallback((e) => {
-    if (touchItem) {
-      e.preventDefault();
+    if (!touchItem) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const touch = e.touches[0];
+    setTouchCurrentPos({ x: touch.clientX, y: touch.clientY });
+    const elementsAtPoint = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const dropCell = elementsAtPoint.find(el =>
+      el.classList.contains('drop-cell') ||
+      el.closest('.drop-cell')
+    );
+    const dragSource = elementsAtPoint.find(el =>
+      el.classList.contains('drag-source') ||
+      el.closest('.drag-source')
+    );
+
+    if (dropCell) {
+      const actualCell = dropCell.classList.contains('drop-cell') ?
+        dropCell : dropCell.closest('.drop-cell');
+      const dropIndex = parseInt(actualCell.getAttribute('data-index'));
+      setTouchOverElement({ type: 'cell', index: dropIndex });
+    } else if (dragSource) {
+      setTouchOverElement({ type: 'source' });
+    } else {
+      setTouchOverElement(null);
     }
   }, [touchItem]);
 
-  const handleTouchEnd = useCallback((e, dropIndex) => {
-    if (touchItem) {
-      const { index: dragIndex, isFromDropZone } = touchItem;
-      
+  const handleTouchEnd = useCallback((e) => {
+    if (!touchItem) return;
+
+    // Prevent default behavior
+    e.preventDefault();
+    e.stopPropagation();
+
+    const { index: dragIndex, isFromDropZone } = touchItem;
+    // Handle drop to cell
+    if (touchOverElement && touchOverElement.type === 'cell') {
+      const dropIndex = touchOverElement.index;
+      setCurr(dropIndex)
+      if (dragIndex !== dropIndex) {
+        setCount(prev => prev + 1);
+      }
       if (dragIndex !== dropIndex || !isFromDropZone) {
         if (!isFromDropZone) {
           if (gridItems[dropIndex] !== null) {
@@ -54,7 +98,9 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
             inx === dropIndex ? dragItems[dragIndex] : item
           ));
           setDragItems(prev => prev.filter((_, inx) => inx !== dragIndex));
+
         } else {
+          // Swap within grid
           setGridItems(prev => {
             const newData = [...prev];
             const temp = newData[dropIndex];
@@ -63,31 +109,33 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
             return newData;
           });
         }
-        setCount(prev => prev + 1);
-      }
-      setTouchItem(null);
-      setTouchStartPos(null);
-    }
-  }, [dragItems, gridItems, touchItem]);
 
-  const handleTouchEndSource = useCallback((e) => {
-    if (touchItem && touchItem.isFromDropZone) {
-      const { index: dragIndex } = touchItem;
-      if (gridItems[dragIndex]) {
+      }
+    }
+    // Handle drop to source
+    else if (touchOverElement && touchOverElement.type === 'source' && isFromDropZone) {
+      if (gridItems[dragIndex] !== null) {
         setDragItems(prev => [...prev, gridItems[dragIndex]]);
         setGridItems(prev => prev.map((item, inx) =>
           inx === dragIndex ? null : item
         ));
         setCount(prev => prev + 1);
       }
-      setTouchItem(null);
-      setTouchStartPos(null);
     }
-  }, [gridItems, touchItem]);
+
+    // Reset touch state
+    setTouchItem(null);
+    setTouchStartPos(null);
+    setTouchCurrentPos(null);
+    setTouchOverElement(null);
+    setIsDragging(false);
+  }, [dragItems, gridItems, touchItem, touchOverElement]);
 
   const handleDrop = useCallback(
     (e, dropIndex) => {
       e.preventDefault();
+      e.stopPropagation();
+
       const dragIndex = parseInt(e.dataTransfer.getData("index"));
       const isFromDropZone = e.dataTransfer.getData("isFromDropZone") === "true";
 
@@ -109,12 +157,15 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
         });
       }
       setCount(prev => prev + 1);
+      setIsDragging(false);
     },
     [dragItems, gridItems]
   );
 
   const handleDragToSource = useCallback((e) => {
     e.preventDefault();
+    e.stopPropagation();
+
     const dragIndex = parseInt(e.dataTransfer.getData("index"));
     const isFromDropZone = e.dataTransfer.getData("isFromDropZone") === "true";
 
@@ -125,6 +176,7 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
       ));
       setCount(prev => prev + 1);
     }
+    setIsDragging(false);
   }, [gridItems]);
   const rightRotate = useCallback((idx) => {
     if (idx === undefined || idx === null) return;
@@ -172,7 +224,8 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
         localStorage.setItem("games", JSON.stringify(data));
       }
     }
-  }, [dragItems, gridItems]);
+  }, [dragItems, gridItems, count]);
+
   const handleRefresh = () => {
     setKey(prev => prev + 1);
     setDragItems([]);
@@ -192,37 +245,156 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
     }
   }, [urls, gridData, rotations]);
 
+  // Add event listeners for document-wide touch events
+  useEffect(() => {
+    const handleDocumentTouchMove = (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        handleTouchMove(e);
+      }
+    };
+
+    const handleDocumentTouchEnd = (e) => {
+      if (isDragging) {
+        handleTouchEnd(e);
+      }
+    };
+
+    // Add passive: false to enable preventDefault() in touch handlers
+    document.addEventListener('touchmove', handleDocumentTouchMove, { passive: false });
+    document.addEventListener('touchend', handleDocumentTouchEnd, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleDocumentTouchMove);
+      document.removeEventListener('touchend', handleDocumentTouchEnd);
+    };
+  }, [isDragging, handleTouchMove, handleTouchEnd]);
+
+  // Create ghost element for touch dragging
+  const TouchDragGhost = () => {
+    if (!touchItem || !touchCurrentPos) return null;
+
+    const item = touchItem.isFromDropZone ? gridItems[touchItem.index] : dragItems[touchItem.index];
+    if (!item) return null;
+
+    const ghostStyle = {
+      position: 'fixed',
+      left: touchCurrentPos.x - 40,
+      top: touchCurrentPos.y - 40,
+      zIndex: 1000,
+      pointerEvents: 'none',
+      opacity: 0.8,
+      borderRadius: '4px',
+      boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+    };
+
+    return (
+      <div style={ghostStyle}>
+        <img
+          src={item.image}
+          alt="dragging"
+          style={{
+            transform: `rotate(${(item.rotations || 0) * 90}deg)`,
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain'
+          }}
+        />
+      </div>
+    );
+  };
+
   return (
     <Fragment>
       {solution &&
-        <Dialog
-          open={open}
-          onClose={() => setOpen(false)}
-          sx={{
-            "& .MuiDialog-paper": {
-              minWidth: "250px",
-              minHeight: "200px",
-              textAlign: "center",
-              padding: "20px",
-              borderRadius: "12px",
-            },
-          }}
-        >
-          <DialogTitle>HINT</DialogTitle>
-          <p style={{ fontSize: "16px", color: "#555" }}>
-          Each time you view a hint, your move count will increase by 2.
-          </p>
-          <div className="solution-images">
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.sqrt(solution.length)}, 0fr)`, gap: "0px" }}>
-              {solution.map((img, index) => (
-                <img key={index} src={img} alt={`Grid ${index}`} />
-              ))}
-            </div>
-          </div>
-          <DialogActions>
-            <Button onClick={() => setOpen(false)}>Close</Button>
-          </DialogActions>
-        </Dialog>}
+       <Dialog
+       open={open}
+       onClose={() => setOpen(false)}
+       sx={{
+         "& .MuiDialog-paper": {
+           minWidth: "300px",
+           minHeight: "250px",
+           textAlign: "center",
+           padding: "24px",
+           borderRadius: "16px",
+           backgroundColor: "#ffffff",
+           color: "#0a2540",
+           boxShadow: "0 8px 32px rgba(10, 37, 64, 0.15)"
+         },
+       }}
+     >
+       <h3 style={{ 
+         margin: "0px", 
+         display: "flex", 
+         alignItems: "center", 
+         justifyContent: "center",
+         fontSize: "28px",
+         fontWeight: "600",
+         color: "#1a73e8"
+       }}>
+         <MdTipsAndUpdates style={{ 
+           marginRight: "12px", 
+           color: "#1a73e8" 
+         }} size={36} />
+         HINT
+       </h3>
+     
+       <p style={{ 
+         fontSize: "16px", 
+         color: "#4285f4", 
+         margin: "20px 0",
+         padding: "10px",
+         backgroundColor: "rgba(66, 133, 244, 0.08)",
+         borderRadius: "8px",
+         fontWeight: "500"
+       }}>
+         Each time you view a hint, your move count will increase by 2.
+       </p>
+       
+       <div className="solution-images" style={{
+         padding: "10px",
+         backgroundColor: "rgba(66, 133, 244, 0.05)",
+         borderRadius: "8px",
+         margin: "0 auto 20px",
+         display: "inline-block"
+       }}>
+         <div style={{ 
+           display: "grid", 
+           gridTemplateColumns: `repeat(${Math.sqrt(solution.length)}, 0fr)`, 
+           gap: "0px",
+           boxShadow: "0 4px 12px rgba(26, 115, 232, 0.1)"
+         }}>
+           {solution.map((img, index) => (
+             <img 
+               key={index} 
+               src={img} 
+               alt={`Grid ${index}`}
+               style={{
+                 border: "1px solid rgba(26, 115, 232, 0.2)"
+               }}
+             />
+           ))}
+         </div>
+       </div>
+       
+       <DialogActions sx={{ justifyContent: "center", paddingTop: "10px" }}>
+         <Button 
+           onClick={() => setOpen(false)}
+           sx={{
+             backgroundColor: "#1a73e8",
+             color: "white",
+             fontWeight: "bold",
+             padding: "8px 24px",
+             borderRadius: "8px",
+             "&:hover": {
+               backgroundColor: "#0d64d8",
+             }
+           }}
+         >
+           Got it!
+         </Button>
+       </DialogActions>
+     </Dialog>}
       <Dialog
         open={solved}
         onClose={() => {
@@ -248,7 +420,7 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
             The puzzle was solved successfully!
           </p>
           <p style={{ fontSize: "16px", color: "#555" }}>
-            "Great job! You solved it in <b>{count}</b> moves and earned a Score of <b>{Math.ceil((gridItems.length * 10 / count) * 100)}</b>! Keep going!"
+            Great job! You solved it in <b>{count}</b> moves and earned a Score of <b>{Math.ceil((gridItems.length * 10 / count) * 100)}</b>! Keep going!
           </p>
         </DialogContent>
         <DialogActions>
@@ -265,7 +437,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
           >
             Close
           </Button>
-
         </DialogActions>
       </Dialog>
       <div className="drag-drop-container">
@@ -273,15 +444,13 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
           <p><b>Count:</b> {count}</p>
         </div>
         <div className="count-container">
-          <p style={{ color: "green", cursor: "pointer" }} onClick={() => {setOpen(true);setCount(prev=>prev+2)}}>HINT!</p>
+          <p style={{ color: "red", cursor: "pointer" }} onClick={() => { setOpen(true); setCount(prev => prev + 2) }}>HINT!</p>
         </div>
         <div className="drag-drop-div">
           <div
             className="drag-source"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDragToSource}
-            onTouchEnd={handleTouchEndSource}
-            onTouchMove={handleTouchMove}
           >
             {dragItems.map((item, index) => (
               <div
@@ -303,10 +472,10 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
             ))}
           </div>
           <div>
-          <div className="rotate-buttons">
-                <button onClick={() => leftRotate(curr)}>Rotate Left {<FaArrowRotateLeft />}</button>
-                <button onClick={() => rightRotate(curr)}>Rotate Right {<FaArrowRotateRight />}</button>
-              </div>
+            <div className="rotate-buttons">
+              <button onClick={() => leftRotate(curr)}>Rotate Left {<FaArrowRotateLeft />}</button>
+              <button onClick={() => rightRotate(curr)}>Rotate Right {<FaArrowRotateRight />}</button>
+            </div>
             <div className="drop-container">
               <div
                 className="drop-grid"
@@ -317,18 +486,18 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
                 {gridItems.map((item, index) => (
                   <div
                     key={`drop-${index}`}
-                    className={`drop-cell ${curr === index ? "active" : ""} ${touchItem && !touchSource ? "touch-active" : ""}`}
+                    className={`drop-cell ${curr === index ? "active" : ""} 
+                      ${touchOverElement && touchOverElement.type === 'cell' && touchOverElement.index === index ? "touch-target" : ""}`}
+                    data-index={index}
                     onDrop={(e) => handleDrop(e, index)}
                     onDragOver={(e) => e.preventDefault()}
-                    onTouchEnd={() => handleTouchEnd(null, index)}
-                    onTouchMove={handleTouchMove}
                     onClick={() => {
-                      if (item) {
+                      if (!isDragging && item) {
                         setCurr(prev => (prev === index ? null : index));
                       }
                     }}
                     onDoubleClick={() => {
-                      if (item) {
+                      if (!isDragging && item) {
                         rightRotate(index);
                       }
                     }}
@@ -336,11 +505,11 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
                     {item && (
                       <div
                         draggable
-                        onDragStart={(e) => handleDragStart(e, index, true)} 
+                        onDragStart={(e) => handleDragStart(e, index, true)}
                         onTouchStart={(e) => handleTouchStart(e, index, true)}
-                        style={{ 
-                          width: "100%", 
-                          height: "100%" 
+                        style={{
+                          width: "100%",
+                          height: "100%"
                         }}
                       >
                         <img
@@ -366,8 +535,8 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
         <button className="solve-button" onClick={() => handleRefresh()}>
           Refresh
         </button>
-
       </div>
+      {TouchDragGhost()}
     </Fragment>
   );
 }

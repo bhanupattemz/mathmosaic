@@ -88,7 +88,7 @@ const solvePuzzle = (grid) => {
 
 
 const CheckSolution = (grid) => {
-    console.log(grid, "chek")
+    
     if (!Array.isArray(grid) || grid.length === 0) {
         return false;
     }
