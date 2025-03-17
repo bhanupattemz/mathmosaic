@@ -16,7 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import logo from "../assets/logo.png";
 import Games from "./Games";
 
-function ResponsiveAppBar({ setGridSize }) {
+function ResponsiveAppBar({ setGridSize,gridKey }) {
     const [open, setOpen] = React.useState(false);
     const [gamesOpen, setGamesOpen] = React.useState(false);
     const [level, setLevel] = React.useState(3);
@@ -25,7 +25,7 @@ function ResponsiveAppBar({ setGridSize }) {
 
     return (
         <AppBar position="static" sx={{ backgroundColor: '#2054ff', boxShadow: 'none' }}>
-            <Games setGamesOpen={setGamesOpen} gamesOpen={gamesOpen} />
+            <Games setGamesOpen={setGamesOpen} gamesOpen={gamesOpen} gridKey={gridKey}/>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Set Level</DialogTitle>
                 <DialogContent>

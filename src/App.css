@@ -28,7 +28,6 @@ body {
   width: 100%;
   height: auto;
   border-radius: 8px;
-  transition: transform 0.2s ease-in-out;
 }
 
 .grid-container img:hover {
@@ -100,6 +99,7 @@ body {
   justify-content: center;
 }
 
+
 .drop-cell {
   width: 50px;
   height: 50px;
@@ -112,6 +112,7 @@ body {
   transition: border-color 0.2s ease-in-out;
 }
 
+
 .drop-cell.active {
   border: 3px solid #000;
 }
@@ -120,6 +121,7 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 6px;
+  transition: transform 0.2s ease-in-out;
 }
 
 .rotate-buttons {
@@ -210,6 +212,7 @@ body {
   height: 80px;
   margin: 1px;
 }
+
 
 
 @media only screen and (max-width: 600px),

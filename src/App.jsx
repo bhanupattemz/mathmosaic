@@ -21,7 +21,7 @@ function App() {
   const [initialized, setInitialized] = useState(false);
   const symbols = [add, sub, multi, divide];
   const cellSize = 200 / gridSize;
-
+  const [key, setKey] = useState(0)
   const shiftArray = (arr, n) => [...arr.slice(-n), ...arr.slice(0, -n)];
 
   const randomRotate = useCallback(() => {
@@ -134,7 +134,7 @@ function App() {
     };
 
     drawAllSymbols();
-  }, [gridSize, extractGridImages]);
+  }, [gridSize, extractGridImages, key]);
 
   useEffect(() => {
     if (!randomized && initialized && gridImages.length === gridSize * gridSize && gridData.length === gridSize * gridSize) {
@@ -142,20 +142,19 @@ function App() {
     }
   }, [gridData, gridImages, gridSize, randomRotate, randomized, initialized]);
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
     <Fragment>
-      <Header setGridSize={setGridSize} />
-      <main>
-        <div className="genpuzzle">
-          <div className="grid-container">
-            <DragDrop urls={gridImages} rotations={rotations} gridData={gridData} setRotations={setRotations} solution={solution} />
+      <Header setGridSize={setGridSize} gridKey={key}/>
+      {loading ? <Loader /> :
+        <main>
+          <div className="genpuzzle">
+            <div className="grid-container">
+              <DragDrop urls={gridImages} rotations={rotations} gridData={gridData} setRotations={setRotations} solution={solution} setKey={setKey} />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      }
+
       <Footer />
     </Fragment>
   );

@@ -3,15 +3,25 @@
 const leftRotate = (arr, n) => {
     if (!Array.isArray(arr) || arr.length === 0) return [];
     const len = arr.length;
-    n = n % len; 
+    n = n % len;
 
     return [...arr.slice(n), ...arr.slice(0, n)];
 };
-
+const rightRotate = (arr, n) => {
+    if (!Array.isArray(arr) || arr.length === 0) return [];
+    for (let i = 0; i < n; i++) {
+        arr = [arr[1], arr[2], arr[3], arr[0]];
+    }
+    return arr;
+};
 const solvePuzzle = (grid) => {
     const processedGrid = grid.map(piece => {
-        let { data, rotations, url } = piece; 
-        data = leftRotate(data, rotations);
+        let { data, rotations, url } = piece;
+        if (rotations > 0) {
+            data = leftRotate(data, rotations);
+        } else {
+            data = rightRotate(data, -rotations)
+        }
         return { data, rotations: 0, url };
     });
 
@@ -22,7 +32,7 @@ const solvePuzzle = (grid) => {
     const rotatePiece = (piece, times) => {
         let rotated = [...piece];
         for (let i = 0; i < times; i++) {
-            rotated = [rotated[3], rotated[0], rotated[1], rotated[2]]; 
+            rotated = [rotated[3], rotated[0], rotated[1], rotated[2]];
         }
         return rotated;
     };
@@ -50,8 +60,8 @@ const solvePuzzle = (grid) => {
                 if (isValid(row, col, rotatedPiece)) {
                     solution[row][col] = {
                         data: rotatedPiece,
-                        rotations: r, 
-                        url: processedGrid[i].url, 
+                        rotations: r,
+                        url: processedGrid[i].url,
                     };
                     used[i] = true;
 
@@ -69,13 +79,16 @@ const solvePuzzle = (grid) => {
 
     const formattedSolution = solution.flat().map(piece => ({
         data: piece.data,
-        rotations: piece.rotations, 
+        rotations: piece.rotations,
         url: piece.url,
     }));
 
     return formattedSolution;
 };
+
+
 const CheckSolution = (grid) => {
+    console.log(grid, "chek")
     if (!Array.isArray(grid) || grid.length === 0) {
         return false;
     }
