@@ -31,7 +31,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
   }, []);
 
   const handleTouchStart = useCallback((e, index, isFromDropZone = false) => {
-    // Prevent default to avoid scrolling
     e.stopPropagation();
     if (gridItems[index]) {
       setCurr(index)
@@ -76,13 +75,10 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
 
   const handleTouchEnd = useCallback((e) => {
     if (!touchItem) return;
-
-    // Prevent default behavior
     e.preventDefault();
     e.stopPropagation();
 
     const { index: dragIndex, isFromDropZone } = touchItem;
-    // Handle drop to cell
     if (touchOverElement && touchOverElement.type === 'cell') {
       const dropIndex = touchOverElement.index;
       setCurr(dropIndex)
@@ -100,7 +96,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
           setDragItems(prev => prev.filter((_, inx) => inx !== dragIndex));
 
         } else {
-          // Swap within grid
           setGridItems(prev => {
             const newData = [...prev];
             const temp = newData[dropIndex];
@@ -112,7 +107,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
 
       }
     }
-    // Handle drop to source
     else if (touchOverElement && touchOverElement.type === 'source' && isFromDropZone) {
       if (gridItems[dragIndex] !== null) {
         setDragItems(prev => [...prev, gridItems[dragIndex]]);
@@ -123,7 +117,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
       }
     }
 
-    // Reset touch state
     setTouchItem(null);
     setTouchStartPos(null);
     setTouchCurrentPos(null);
@@ -245,7 +238,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
     }
   }, [urls, gridData, rotations]);
 
-  // Add event listeners for document-wide touch events
   useEffect(() => {
     const handleDocumentTouchMove = (e) => {
       if (isDragging) {
@@ -259,8 +251,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
         handleTouchEnd(e);
       }
     };
-
-    // Add passive: false to enable preventDefault() in touch handlers
     document.addEventListener('touchmove', handleDocumentTouchMove, { passive: false });
     document.addEventListener('touchend', handleDocumentTouchEnd, { passive: false });
 
@@ -270,7 +260,6 @@ export default function DragDrop({ urls, rotations, gridData, solution, setKey }
     };
   }, [isDragging, handleTouchMove, handleTouchEnd]);
 
-  // Create ghost element for touch dragging
   const TouchDragGhost = () => {
     if (!touchItem || !touchCurrentPos) return null;
 
